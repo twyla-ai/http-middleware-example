@@ -1,0 +1,4 @@
+starlette==0.12.9
+ujson==1.35
+uvicorn==0.9.0
+twyla-chat-templates==0.1.0

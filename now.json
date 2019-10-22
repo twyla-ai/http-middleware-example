@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "twyla-http-middleware",
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@now/python"
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/api/$1", "continue": true },
+    { "src": "/api", "dest": "/api/hello", "continue": true },
+    { "src": "/api/(.*)", "dest": "/api/$1", "continue": true },
+    { "src": "/api/.*", "dest": "api/app.py" }
+  ]
+}
