@@ -1,9 +1,10 @@
+import aiohttp
 import uvicorn
 from starlette.applications import Starlette
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import UJSONResponse as JSONResponse
-from twyla.chat.templates.buttons import Buttons, UrlButton
+from twyla.chat.templates.buttons import Buttons, UrlButton, PostBackButton
 from twyla.chat.templates.text import TextTemplate
 
 app = Starlette(debug=False)
@@ -33,6 +34,31 @@ async def not_found(request: Request, exc: HTTPException) -> JSONResponse:
 @app.route("/api/hello")
 async def hello(request: Request):
     return JSONResponse(TextTemplate("Hello there, I am up and running.").asdict())
+
+
+@app.route("/api/todo")
+async def todo_buttons(_: Request) -> JSONResponse:
+    async with aiohttp.ClientSession() as client:
+        async with client.get("https://jsonplaceholder.typicode.com/todos") as resp:
+            data = await resp.json()
+        buttons = Buttons(text="Select Item")
+        for item in data[: min(len(data), 3)]:
+            i = item.get("id")
+            buttons.add(PostBackButton(title=f"Item {i}", payload="x_todo_item_{i}_x"))
+        return JSONResponse(buttons.asdict())
+
+
+@app.route("/api/todo/{item}")
+async def todo_item(request: Request) -> JSONResponse:
+    item = request.path_params.get("item")
+
+    async with aiohttp.ClientSession() as client:
+        async with client.get(
+            f"https://jsonplaceholder.typicode.com/todos/{item}"
+        ) as resp:
+            data = await resp.json()
+
+        return JSONResponse(TextTemplate(payload=data.get("title")))
 
 
 if __name__ == "__main__":
