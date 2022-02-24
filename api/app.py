@@ -44,7 +44,7 @@ async def todo_buttons(_: Request) -> JSONResponse:
         buttons = Buttons(text="Select Item")
         for item in data[: min(len(data), 3)]:
             i = item.get("id")
-            buttons.add(PostBackButton(title=f"Item {i}", payload="x_todo_item_{i}_x"))
+            buttons.add(PostBackButton(title=f"Item {i}", payload=f"x_todo_item_{i}_x"))
         return JSONResponse(buttons.asdict())
 
 
